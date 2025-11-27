@@ -2,16 +2,21 @@ from django.shortcuts import render
 
 from datetime import datetime, date
 
-def calculate_age() -> tuple[int, int]:
-    # data_birth = datetime.strptime(input("Введите дату рождения (дд.мм.гггг): "),"%d.%m.%Y")
-    # data_s = input("Нажмите Enter, чтобы использовать сегодняшнюю дату для расчёта показателей, или введите расчётную дату (дд.мм.гггг): ").strip()
-    # if data_s == "":
-    #     data_ras = datetime.combine(date.today(), datetime.min.time())
-    # else:
-        # data_ras = datetime.strptime(input("Введите расчётную дату (дд.мм.гггг): "),"%d.%m.%Y")
+def normalize_date(date_str: str) -> datetime:
+    cleaned = re.sub(r"\D", ".", date_str)
+    cleaned = re.sub(r"\.+", ".", cleaned).strip(".")
+    return datetime.strptime(cleaned, "%d.%m.%Y")
 
-    data_ras = datetime.strptime("25.11.2025", "%d.%m.%Y")
-    data_birth = datetime.strptime("25.11.2018", "%d.%m.%Y")
+def calculate_age() -> tuple[int, int]:
+    data_birth = normalize_date(input("Введите дату рождения (дд.мм.гггг): "))
+    data_s = input("Нажмите Enter, чтобы использовать сегодняшнюю дату для расчёта показателей, или введите расчётную дату (дд.мм.гггг): ").strip()
+    if data_s == "":
+        data_ras = datetime.combine(date.today(), datetime.min.time())
+    else:
+        data_ras = normalize_date(data_s)
+
+    # data_ras = datetime.strptime("25.11.2025", "%d.%m.%Y")
+    # data_birth = datetime.strptime("25.11.2018", "%d.%m.%Y")
     years = data_ras.year - data_birth.year
     months = data_ras.month - data_birth.month
     days = data_ras.day - data_birth.day
