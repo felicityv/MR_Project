@@ -1,5 +1,6 @@
 from django.shortcuts import render
-
+from django.http import HttpResponse
+from .models import Rost
 from datetime import datetime, date
 
 def normalize_date(date_str: str) -> datetime:
@@ -657,6 +658,7 @@ centiles_female_imt=[
     {'age': '17.0', 'ME': 21.74, 'SD': 2.735, 'p3': 17.621, 'p10': 18.612, 'p25': 19.75, 'p50': 21.508, 'p75': 23.401, 'p90': 25.515, 'p97': 28.112}, 
     {'age': '17.6', 'ME': 21.837, 'SD': 2.715, 'p3': 17.824, 'p10': 18.788, 'p25': 19.902, 'p50': 21.663, 'p75': 23.491, 'p90': 25.841, 'p97': 28.542}, 
     {'age': '18.0', 'ME': 21.784, 'SD': 2.8, 'p3': 17.864, 'p10': 18.811, 'p25': 19.904, 'p50': 21.654, 'p75': 23.419, 'p90': 26.027, 'p97': 29.153}]
+
 centiles_male_rost=[
     {'age': '1.0', 'ME': 76.74, 'SD': 3.87, 'p3': 70.49, 'p10': 72.02, 'p25': 74.18, 'p50': 76.82, 'p75': 79.82, 'p90': 80.5, 'p97': 84.53}, 
     {'age': '1.3', 'ME': 79.05, 'SD': 3.95, 'p3': 72.57, 'p10': 74.24, 'p25': 76.39, 'p50': 79.06, 'p75': 81.96, 'p90': 83.17, 'p97': 87.2}, 
@@ -1030,4 +1032,24 @@ def main():
     harmony_result = harmony(corr_r, corr_v)
     print(harmony_result)
     narushenia_result = narushenia(sds_r, sds_v, sds_i, age_years)
-main()
+# main()
+
+def rost_sozdanie(request):
+    for i in centiles_male_rost:
+        Rost.objects.create(
+        gender="M", 
+        age=i.get("age"),
+        ME=i.get("ME"),
+        SD=i.get("SD"),
+        p3=i.get("p3"),
+        p10=i.get("p10"),
+        p25=i.get("p25"),
+        p50=i.get("p50"),
+        p75=i.get("p75"),
+        p90=i.get("p90"),
+        p97= i.get("p97")
+        )
+    return HttpResponse("Заполняем таблицу рост девочек и мальчиков")
+
+
+
