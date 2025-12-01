@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Rost
+from .models import Imt
 from datetime import datetime, date
+from .models import Patient
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 def normalize_date(date_str: str) -> datetime:
     cleaned = re.sub(r"\D", ".", date_str)
@@ -519,9 +523,9 @@ centiles_female_rost=[
     {'age': '17.0', 'ME': 163.76, 'SD': 5.7, 'p3': 153.58, 'p10': 156.13, 'p25': 159.92, 'p50': 163.72, 'p75': 167.72, 'p90': 171.29, 'p97': 174.22}, 
     {'age': '17.6', 'ME': 163.8, 'SD': 5.7, 'p3': 153.69, 'p10': 156.16, 'p25': 160.0, 'p50': 163.85, 'p75': 167.86, 'p90': 171.42, 'p97': 174.28}, 
     {'age': '18.0', 'ME': 164.0, 'SD': 5.75, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 163.95, 'p75': 167.95, 'p90': 171.53, 'p97': 174.33}, 
-    {'age': '19-24', 'ME': 164.03, 'SD': 5.84, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 164.0, 'p75': 168.02, 'p90': 171.63, 'p97': 174.38}, 
-    {'age': '25-34', 'ME': 164.1, 'SD': 5.99, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 164.0, 'p75': 168.07, 'p90': 171.74, 'p97': 174.45}, 
-    {'age': '35-45', 'ME': 164.12, 'SD': 6.2, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 164.0, 'p75': 168.11, 'p90': 171.86, 'p97': 174.56}
+    # {'age': '19-24', 'ME': 164.03, 'SD': 5.84, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 164.0, 'p75': 168.02, 'p90': 171.63, 'p97': 174.38}, 
+    # {'age': '25-34', 'ME': 164.1, 'SD': 5.99, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 164.0, 'p75': 168.07, 'p90': 171.74, 'p97': 174.45}, 
+    # {'age': '35-45', 'ME': 164.12, 'SD': 6.2, 'p3': 153.7, 'p10': 156.17, 'p25': 160.0, 'p50': 164.0, 'p75': 168.11, 'p90': 171.86, 'p97': 174.56}
 ]
 centiles_female_ves=[
     {'age': '1.0', 'ME': 9.8, 'SD': 0.95, 'p3': 8.19, 'p10': 9.03, 'p25': 9.39, 'p50': 9.79, 'p75': 10.06, 'p90': 11.0, 'p97': 11.8}, 
@@ -588,9 +592,9 @@ centiles_female_ves=[
     {'age': '16.6', 'ME': 57.66, 'SD': 8.24, 'p3': 44.77, 'p10': 47.94, 'p25': 51.8, 'p50': 57.05, 'p75': 62.27, 'p90': 67.95, 'p97': 76.0}, 
     {'age': '17.0', 'ME': 58.19, 'SD': 8.25, 'p3': 45.59, 'p10': 48.54, 'p25': 52.25, 'p50': 57.53, 'p75': 62.8, 'p90': 68.63, 'p97': 76.49}, 
     {'age': '17.6', 'ME': 58.62, 'SD': 8.28, 'p3': 46.34, 'p10': 49.03, 'p25': 52.55, 'p50': 57.87, 'p75': 63.24, 'p90': 69.29, 'p97': 76.91}, 
-    {'age': '18.0', 'ME': 58.92, 'SD': 8.34, 'p3': 47.02, 'p10': 49.37, 'p25': 52.68, 'p50': 58.07, 'p75': 63.59, 'p90': 69.93, 'p97': 77.25}, 
-    {'age': '19-24', 'ME': 59.1, 'SD': 8.45, 'p3': 47.61, 'p10': 49.56, 'p25': 52.63, 'p50': 58.21, 'p75': 63.86, 'p90': 70.57, 'p97': 77.53}, 
-    {'age': '25-45', 'ME': 59.3, 'SD': 8.61, 'p3': 48.11, 'p10': 49.58, 'p25': 52.38, 'p50': 58.32, 'p75': 64.02, 'p90': 71.21, 'p97': 77.75}
+    {'age': '18.0', 'ME': 58.92, 'SD': 8.34, 'p3': 47.02, 'p10': 49.37, 'p25': 52.68, 'p50': 58.07, 'p75': 63.59, 'p90': 69.93, 'p97': 77.25} 
+    # {'age': '19-24', 'ME': 59.1, 'SD': 8.45, 'p3': 47.61, 'p10': 49.56, 'p25': 52.63, 'p50': 58.21, 'p75': 63.86, 'p90': 70.57, 'p97': 77.53}, 
+    # {'age': '25-45', 'ME': 59.3, 'SD': 8.61, 'p3': 48.11, 'p10': 49.58, 'p25': 52.38, 'p50': 58.32, 'p75': 64.02, 'p90': 71.21, 'p97': 77.75}
 ]
 centiles_female_imt=[
     {'age': '1.0', 'ME': 18.27, 'SD': 2.044, 'p3': 14.618, 'p10': 15.718, 'p25': 16.502, 'p50': 18.123, 'p75': 19.674, 'p90': 20.708, 'p97': 22.003}, 
@@ -1034,22 +1038,51 @@ def main():
     narushenia_result = narushenia(sds_r, sds_v, sds_i, age_years)
 # main()
 
-def rost_sozdanie(request):
-    for i in centiles_male_rost:
-        Rost.objects.create(
-        gender="M", 
-        age=i.get("age"),
-        ME=i.get("ME"),
-        SD=i.get("SD"),
-        p3=i.get("p3"),
-        p10=i.get("p10"),
-        p25=i.get("p25"),
-        p50=i.get("p50"),
-        p75=i.get("p75"),
-        p90=i.get("p90"),
-        p97= i.get("p97")
-        )
-    return HttpResponse("Заполняем таблицу рост девочек и мальчиков")
+# def imt_sozdanie(request):
+    # def create_entry(i, gender):
+    #     age_value = i.get("age")
+    #     if "-" in age_value:
+    #         parts = age_value.split("-")
+    #         age_int1 = float(parts[0])
+    #         age_int2 = float(parts[1])
+    #         age = age_int1   # в age сохраняем первое значение интервала
+    #     else:
+    #             age = float(age_value)
+    #             age_int1 = age
+    #             age_int2 = age
+    # for i in centiles_male_imt:
+    #     Imt.objects.create(
+    #     gender="M", 
+    #     age=i.get("age"),
+    #     ME=i.get("ME"),
+    #     SD=i.get("SD"),
+    #     p3=i.get("p3"),
+    #     p10=i.get("p10"),
+    #     p25=i.get("p25"),
+    #     p50=i.get("p50"),
+    #     p75=i.get("p75"),
+    #     p90=i.get("p90"),
+    #     p97= i.get("p97")
+    #     )
+    # for i in centiles_female_imt:
+    #     Imt.objects.create(
+    #     gender="Ж", 
+    #     age=i.get("age"),
+    #     ME=i.get("ME"),
+    #     SD=i.get("SD"),
+    #     p3=i.get("p3"),
+    #     p10=i.get("p10"),
+    #     p25=i.get("p25"),
+    #     p50=i.get("p50"),
+    #     p75=i.get("p75"),
+    #     p90=i.get("p90"),
+    #     p97= i.get("p97")
+    #     )
+    # return HttpResponse("Заполняем таблицу имт девочек и мальчиков")
+
+def patient_info(request):
+    patients = Patient.objects.all()
+    return render(request, 'info.html', {'patients': patients})
 
 
 

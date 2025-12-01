@@ -1,0 +1,13 @@
+<h1>Список пациентов</h1>
+<ul>
+    {% for patient in patients %}
+        <li>
+            {{ patient.surname }} {{ patient.name }}
+            <p>
+            {% if patient.foto %}
+                <img src="{{ patient.foto.url }}" alt="Фото пациента" width="240">
+            {% endif %}
+            </p>
+        </li>
+    {% endfor %}
+</ul>
