@@ -1,16 +1,24 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Imt
+from .models import Ves
+from .models import Rost
 from datetime import datetime, date
 from .models import Patient
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from .models import Narushenie
+from .models import OsmotrPatient
+from .models import Narushenie
+from .models import FizicRazvit
+
 
 def normalize_date(date_str: str) -> datetime:
     cleaned = re.sub(r"\D", ".", date_str)
     cleaned = re.sub(r"\.+", ".", cleaned).strip(".")
     return datetime.strptime(cleaned, "%d.%m.%Y")
+
 
 def calculate_age() -> tuple[int, int]:
     data_birth = normalize_date(input("Введите дату рождения (дд.мм.гггг): "))
@@ -31,8 +39,10 @@ def calculate_age() -> tuple[int, int]:
         years -= 1
         months += 12
     return years, months
-# age_years, age_months = calculate_age(data_birth, data_ras)
-# print(f"Возраст: {age_years} лет и {age_months} месяцев")
+# # age_years, age_months = calculate_age(data_birth, data_ras)
+# # print(f"Возраст: {age_years} лет и {age_months} месяцев")
+
+
 
 def calculate_age_key(age_years, age_months):
     if 1 <= age_months <= 3:
@@ -973,40 +983,61 @@ def harmony(rost_corridor, ves_corridor):
 
 def narushenia(SDSrost, SDSves, SDSimt, age_years):
     if SDSrost <= -2:
-        print(f"Низкорослость или хроническая белково-энергетическая недостаточность, умеренной степени (рост = {SDSrost} SDS)")
-        return
+        # print(f"Низкорослость или хроническая белково-энергетическая недостаточность, умеренной степени (рост = {SDSrost} SDS)")
+        # return
+        return Narushenie.objects.get_or_create(type_narushenia="{ХБЭН")
+    
     elif SDSrost >= 2:
-        print(f"Высокорослость (рост = {SDSrost} SDS).")
-        return
+        # print(f"Высокорослость (рост = {SDSrost} SDS).")
+        # return
+        return Narushenie.objects.get_or_create(type_narushenia="Высокорослость")
+    
     if age_years < 5:
         if SDSves >= 3 or SDSimt >= 3:
-            print(f"Ожирение (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).")
-            return
+            # print(f"Ожирение (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Ожирение")
+        
         if SDSves >= 2 or SDSimt >= 2:
-            print(f"Избыток массы тела (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).).")
-            return
+            # print(f"Избыток массы тела (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Избыток массы тела")
+        
     else:
         if SDSimt > 2:
-            print(f"Ожирение (индекс массы тела = {SDSimt} SDS).")
-            return
+            # print(f"Ожирение (индекс массы тела = {SDSimt} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Ожирение")
+        
         if SDSimt > 1:
-            print(f"Избыток массы тела (индекс массы тела = {SDSimt} SDS).")
-            return
+            # print(f"Избыток массы тела (индекс массы тела = {SDSimt} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Избыток массы тела")
+                    
     if age_years < 5:
         if SDSves <= -3 or SDSimt <= -3:
-            print(f"Острая белково-энергетическая недостаточность, тяжёлой степени (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).")
-            return
+            # print(f"Острая белково-энергетическая недостаточность, тяжёлой степени (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Острая белково-энергетическая недостаточность, тяжёлой степени")
+              
         if SDSves <= -2 or SDSimt <= -2:
-            print(f"Острая белково-энергетическая недостаточность, умеренной степени (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).")
-            return
+            # print(f"Острая белково-энергетическая недостаточность, умеренной степени (индекс массы тела = {SDSimt} SDS, вес = {SDSves} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Острая белково-энергетическая недостаточность, умеренной степени")
+          
     else:
         if SDSimt <= -3:
-            print(f"Острая белково-энергетическая недостаточность, тяжёлой степени (индекс массы тела = {SDSimt} SDS).")
-            return
+            # print(f"Острая белково-энергетическая недостаточность, тяжёлой степени (индекс массы тела = {SDSimt} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Острая белково-энергетическая недостаточность, тяжёлой степени")
+          
         if SDSimt <= -2:
-            print(f"Острая белково-энергетическая недостаточность, умеренной степени (индекс массы тела = {SDSimt} SDS).")
-            return
+            # print(f"Острая белково-энергетическая недостаточность, умеренной степени (индекс массы тела = {SDSimt} SDS).")
+            # return
+            return Narushenie.objects.get_or_create(type_narushenia="Острая белково-энергетическая недостаточность, умеренной степени")
+          
     print("Нарушений не выявлено")
+    return Narushenie.objects.get_or_create(type_narushenia="Нарушений не выявлено")  
 
 def main():
     age_years, age_months = calculate_age()

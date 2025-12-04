@@ -1,13 +1,30 @@
-<h1>Список пациентов</h1>
-<ul>
+{% extends "base.html" %}
+
+{% block title %}Список пациентов{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Список пациентов</h1>
+<div class="row">
     {% for patient in patients %}
-        <li>
-            {{ patient.surname }} {{ patient.name }}
-            <p>
-            {% if patient.foto %}
-                <img src="{{ patient.foto.url }}" alt="Фото пациента" width="240">
-            {% endif %}
-            </p>
-        </li>
+        <div class="col-md-4 mb-4">
+            <div class="card border shadow-sm h-100" style="width: 18rem;">
+                {% if patient.foto %}
+                    <img src="{{ patient.foto.url }}" class="card-img-top" alt="Фото пациента" width="320">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ patient.surname }} {{ patient.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ patient.age_display }}</h6>
+                    <p class="card-text">
+                        <strong>Дата рождения:</strong> {{ patient.data_birth|date:"j E Y" }} <br>
+                        <strong>Пол:</strong> {{ patient.get_gender_display }} <br>
+                        <strong>Рост:</strong> {{ patient.rost }} см <br>
+                        <strong>Вес:</strong> {{ patient.ves }} кг <br>
+                        <strong>ИМТ:</strong> {{ patient.imt }}
+                    </p>
+                    <a href="{% url 'patient_detail' patient.id %}" class="card-link">Подробнее</a>
+                </div>
+            </div>
+        </div>
     {% endfor %}
-</ul>
+</div>
+{% endblock %}
