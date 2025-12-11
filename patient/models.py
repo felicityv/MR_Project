@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import date
-from .services import analyze_centile, fizrazvitie
+from fiz_razv.services import analyze_centile, fizrazvitie
+from fiz_razv.models import Narushenie
+from fiz_razv.models import Rost, Ves, Imt
 
 class Patient(models.Model):
     GENDER_CHOICES = {
@@ -54,17 +56,21 @@ class OsmotrPatient(models.Model):
         "выше 97": "выше 97"
     }
     data_osmotra = models.DateTimeField(auto_now_add=True)
-    rost_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES)
-    rost_SDS = models.FloatField()
-    ves_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES)
-    ves_SDS = models.FloatField()
-    imt_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES)
-    imt_SDS = models.FloatField()
+    rost = models.FloatField()
+    ves = models.FloatField()
+    imt = models.FloatField(editable=False)
+    rost_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False)
+    rost_SDS = models.FloatField(editable=False)
+    ves_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False)
+    ves_SDS = models.FloatField(editable=False)
+    imt_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False)
+    imt_SDS = models.FloatField(editable=False)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    fizic_razvitie = models.ManyToManyField(FizicRazvit)
-    narushenie = models.ManyToManyField(Narushenie)
+    fizic_razvitie = models.ManyToManyField("fiz_razv.FizicRazvit", editable=False)
+    narushenie = models.ManyToManyField("fiz_razv.Narushenie", editable=False)
 
     def save(self, *args, **kwargs):
+        self.imt = round(self.ves / ((self.rost / 100) ** 2), 1)
         age_years = self.patient.calculate_age[0]
         gender = self.patient.gender
         self.rost_SDS, self.rost_centil = analyze_centile(self.patient.rost, Rost, age_years, gender)
@@ -72,9 +78,14 @@ class OsmotrPatient(models.Model):
         self.imt_SDS, self.imt_centil = analyze_centile(self.patient.imt, Imt, age_years, gender)
         fiz_text = fizrazvitie(self.rost_centil, self.ves_centil)
         print(fiz_text)
+        self.patient.rost = self.rost
+        self.patient.ves = self.ves
+        self.patient.imt = self.imt
+        self.patient.save(update_fields=["rost", "ves", "imt"])
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Осмотр {self.patient} от {self.data_osmotra.date()}'
+
 
 

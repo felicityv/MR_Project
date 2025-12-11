@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from .views import patient_info
+
 # from .views import imt_sozdanie
 from . import views 
 urlpatterns = [

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Карточка пациента{% endblock %}
+
+{% block content %}
+<h1>{{ patient.surname }} {{ patient.name }}</h1>
+<p><strong>Возраст:</strong> {{ patient.age_display }}</p>
+<p><strong>Рост:</strong> {{ patient.rost }} см</p>
+<p><strong>Вес:</strong> {{ patient.ves }} кг</p>
+<p><strong>ИМТ:</strong> {{ patient.imt }}</p>
+
+<hr>
+<h2>История осмотров</h2>
+{% if osmotry %}
+    <ul>
+        {% for osmotr in osmotry %}
+            <li>{{ osmotr.data_osmotra|date:"j E Y H:i" }} — Рост: {{ osmotr.rost }} см, Вес: {{ osmotr.ves }} кг, ИМТ: {{ osmotr.imt }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Осмотры пока не добавлены.</p>
+{% endif %}
+
+<hr>
+<h2>Добавить новый осмотр</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Сохранить осмотр</button>
+</form>
+
+<a href="{% url 'patient_list' %}" class="btn btn-secondary mt-3">← Назад к списку</a>
+{% endblock %}

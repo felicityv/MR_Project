@@ -1,18 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Imt
-from .models import Ves
-from .models import Rost
 from datetime import datetime, date
-from .models import Patient
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from .models import Narushenie
-from .models import OsmotrPatient
-from .models import Narushenie
 from .models import FizicRazvit
-from patient.models import Patient
 from datetime import date
 
 # def normalize_date(date_str: str) -> datetime:
@@ -22,26 +15,12 @@ from datetime import date
 
 def calculate_age() -> tuple[int, int]:
     data_ras = models.DateField(default=date.today)
-
-
-
-class OsmotrPatient(models.Model):
-    data_osmotra = models.DateField(default=date.today)
-    # data_ras = datetime.strptime("25.11.2025", "%d.%m.%Y")
-    # data_birth = datetime.strptime("25.11.2018", "%d.%m.%Y")
-    years = data_ras.year - data_birth.year
-    months = data_ras.month - data_birth.month
-    days = data_ras.day - data_birth.day
     if days < 0:
         months -= 1
     if months < 0:
         years -= 1
         months += 12
     return years, months
-# # age_years, age_months = calculate_age(data_birth, data_ras)
-# # print(f"Возраст: {age_years} лет и {age_months} месяцев")
-
-
 
 def calculate_age_key(age_years, age_months):
     if 1 <= age_months <= 3:
@@ -55,7 +34,6 @@ def calculate_age_key(age_years, age_months):
     else:
         age_key = float(age_years)
     return age_key
-
 
 def narushenia(SDSrost, SDSves, SDSimt, age_years):
     if SDSrost <= -2:
@@ -187,9 +165,6 @@ def main():
     #     )
     # return HttpResponse("Заполняем таблицу имт девочек и мальчиков")
 
-def patient_info(request):
-    patients = Patient.objects.all()
-    return render(request, 'info.html', {'patients': patients})
 
 
 

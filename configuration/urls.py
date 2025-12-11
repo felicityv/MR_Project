@@ -24,7 +24,8 @@ from django.urls import path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main),
-    path('', include("fiz_razv.urls")),
+    # path('', include("fiz_razv.urls")),
+    path('', include('patient.urls')),
 ]
 
 if settings.DEBUG:
