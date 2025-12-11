@@ -22,18 +22,6 @@ def calculate_age() -> tuple[int, int]:
         months += 12
     return years, months
 
-def calculate_age_key(age_years, age_months):
-    if 1 <= age_months <= 3:
-        age_key = age_years + 0.3
-    elif 4 <= age_months <= 6:
-        age_key = age_years + 0.6
-    elif 7 <= age_months <= 9:
-        age_key = age_years + 0.9
-    elif 10 <= age_months <= 11:
-        age_key = age_years + 1.0
-    else:
-        age_key = float(age_years)
-    return age_key
 
 def narushenia(SDSrost, SDSves, SDSimt, age_years):
     if SDSrost <= -2:

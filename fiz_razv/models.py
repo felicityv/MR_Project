@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import date
-from .services import analyze_centile, fizrazvitie
 
 class FizicRazvit(models.Model):
     STEPEN_CHOICES = {

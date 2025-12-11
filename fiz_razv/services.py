@@ -1,7 +1,21 @@
 from .models import FizicRazvit
 
-def analyze_centile(parametr, model_class, age, gender):
-    centile_row = model_class.objects.filter(gender=gender, age=age).first()
+def calculate_age_key(age_years, age_months):
+    if 1 <= age_months <= 3:
+        age_key = age_years + 0.3
+    elif 4 <= age_months <= 6:
+        age_key = age_years + 0.6
+    elif 7 <= age_months <= 9:
+        age_key = age_years + 0.9
+    elif 10 <= age_months <= 11:
+        age_key = age_years + 1.0
+    else:
+        age_key = float(age_years)
+    return age_key
+
+def analyze_centile(parametr, model_class, age_key, gender): 
+    centile_row = model_class.objects.filter(gender=gender, age=age_key)
+    print(centile_row)
     ME = float(centile_row.ME)
     SD = float(centile_row.SD or 1.0)
     SDS = round((parametr - ME) / SD, 2)

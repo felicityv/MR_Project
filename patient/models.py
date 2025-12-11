@@ -1,7 +1,5 @@
 from django.db import models
 from datetime import date
-from fiz_razv.services import analyze_centile, fizrazvitie
-from fiz_razv.models import Narushenie
 from fiz_razv.models import Rost, Ves, Imt
 
 class Patient(models.Model):
@@ -56,32 +54,36 @@ class OsmotrPatient(models.Model):
         "выше 97": "выше 97"
     }
     data_osmotra = models.DateTimeField(auto_now_add=True)
-    rost = models.FloatField()
-    ves = models.FloatField()
-    imt = models.FloatField(editable=False)
-    rost_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False)
-    rost_SDS = models.FloatField(editable=False)
-    ves_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False)
-    ves_SDS = models.FloatField(editable=False)
-    imt_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False)
-    imt_SDS = models.FloatField(editable=False)
+    rost = models.FloatField(null=True, blank=True)
+    ves = models.FloatField(null=True, blank=True)
+    imt = models.FloatField(editable=False, null=True, blank=True)
+    rost_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False, null=True, blank=True)
+    rost_SDS = models.FloatField(editable=False, null=True, blank=True)
+    ves_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False, null=True, blank=True)
+    ves_SDS = models.FloatField(editable=False, null=True, blank=True)
+    imt_centil = models.CharField(max_length=10, choices=CENTIL_CHOICES, editable=False, null=True, blank=True)
+    imt_SDS = models.FloatField(editable=False, null=True, blank=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     fizic_razvitie = models.ManyToManyField("fiz_razv.FizicRazvit", editable=False)
     narushenie = models.ManyToManyField("fiz_razv.Narushenie", editable=False)
 
     def save(self, *args, **kwargs):
+        from fiz_razv.services import analyze_centile, fizrazvitie, calculate_age_key
         self.imt = round(self.ves / ((self.rost / 100) ** 2), 1)
-        age_years = self.patient.calculate_age[0]
+        years, months = self.patient.calculate_age
+        age_key = calculate_age_key(years, months)
+        print(age_key)
+        # age_years = self.patient.calculate_age[0]
         gender = self.patient.gender
-        self.rost_SDS, self.rost_centil = analyze_centile(self.patient.rost, Rost, age_years, gender)
-        self.ves_SDS, self.ves_centil = analyze_centile(self.patient.ves, Ves, age_years, gender)
-        self.imt_SDS, self.imt_centil = analyze_centile(self.patient.imt, Imt, age_years, gender)
+        self.rost_SDS, self.rost_centil = analyze_centile(self.rost, Rost, age_key, gender)
+        self.ves_SDS, self.ves_centil = analyze_centile(self.ves, Ves, age_key, gender)
+        self.imt_SDS, self.imt_centil = analyze_centile(self.imt, Imt, age_key, gender)
         fiz_text = fizrazvitie(self.rost_centil, self.ves_centil)
         print(fiz_text)
         self.patient.rost = self.rost
         self.patient.ves = self.ves
         self.patient.imt = self.imt
-        self.patient.save(update_fields=["rost", "ves", "imt"])
+        self.patient.save()
         super().save(*args, **kwargs)
 
     def __str__(self):
