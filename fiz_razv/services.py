@@ -1,3 +1,5 @@
+from .models import FizicRazvit
+
 def analyze_centile(parametr, model_class, age, gender):
     centile_row = model_class.objects.filter(gender=gender, age=age).first()
     ME = float(centile_row.ME)
