@@ -3,15 +3,26 @@ from django.http import HttpRequest
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from patient.models import Patient
+from .models import Patient, OsmotrPatient,PatientImage
 
 
 def patient_list(request):
-    """Выводит список всех пациентов"""
     patients = Patient.objects.all()
-    return render(request, 'patient_list.html', {'patients': patients})
+    context = {
+    'patients': patients,
+    }
+    return render(request, 'patient_list.html', context)
 
 def patient_detail(request, id):
-    """Выводит карточку конкретного пациента"""
     patient = get_object_or_404(Patient, id=id)
-    return render(request, 'patient_detail.html', {'patient': patient})
+    osmotry = OsmotrPatient.objects.filter(patient=patient).order_by('-data_osmotra')
+    images = PatientImage.objects.filter(patient=patient)
+    context = {
+    'patient': patient,
+    'osmotry': osmotry,
+    'images': images,
+    }
+    return render(request, 'patient_detail.html', context)
+
+
+

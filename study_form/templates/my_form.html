@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Форма{% endblock %}
+
+{% block content %}
+<h2>Форма</h2>
+
+<form method="post" style="display: flex; flex-direction: column; gap: 5px; max-width: 200px;">
+  {% csrf_token %}
+  <input type="text" name="first_name" placeholder="Имя" required>
+  <input type="text" name="last_name" placeholder="Фамилия" required>
+  <input type="number" name="age" placeholder="Возраст" required>
+  <button type="submit">Отправить</button>
+</form>
+<div class="">
+  {% for author in authors %}
+    <p> {{author.first_name}} {{author.last_name}} {{author.age}}</p>
+  {% endfor %}
+{% endblock %}

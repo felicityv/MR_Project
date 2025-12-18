@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Список пациентов{% endblock %}
-
 {% block content %}
 <h1 class="mb-4">Список пациентов</h1>
 <div class="row">
@@ -9,10 +8,12 @@
         <div class="col-md-4 mb-4">
             <div class="card border shadow-sm h-100" style="width: 18rem;">
                 {% if patient.foto %}
-                    <img src="{{ patient.foto.url }}" class="card-img-top" alt="Фото пациента" width="320">
+                    <div class="card-img-square-box"
+                    style="background-image:url('{{ patient.foto.url }}')">
+                    </div>
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{ patient.surname }} {{ patient.name }}</h5>
+                    <a href="{% url 'patient_detail' patient.id %}" h5 class="card-link">{{ patient.surname }} {{ patient.name }}</h5></a>
                     <h6 class="card-subtitle mb-2 text-muted">{{ patient.age_display }}</h6>
                     <p class="card-text">
                         <strong>Дата рождения:</strong> {{ patient.data_birth|date:"j E Y" }} <br>
@@ -21,7 +22,6 @@
                         <strong>Вес:</strong> {{ patient.ves }} кг <br>
                         <strong>ИМТ:</strong> {{ patient.imt }}
                     </p>
-                    <a href="{% url 'patient_detail' patient.id %}" class="card-link">Подробнее</a>
                 </div>
             </div>
         </div>

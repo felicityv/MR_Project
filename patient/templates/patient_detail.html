@@ -1,9 +1,33 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Карточка пациента{% endblock %}
-
+        {% block css %}
+<link rel="stylesheet" href="{% static 'css/patient.css' %}">
+        {% endblock %}
 {% block content %}
 <h1>{{ patient.surname }} {{ patient.name }}</h1>
+<div id="patientCarousel" class="carousel slide square-carousel" data-bs-ride="carousel" data-bs-interval="3000">
+  <div class="carousel-inner">
+    {% if patient.foto %}
+      <div class="carousel-item active">
+        <img src="{{ patient.foto.url }}" class="d-block w-100" alt="Фото пациента">
+      </div>
+    {% endif %}
+
+    {% for image in images %}
+      <div class="carousel-item {% if not patient.foto and forloop.first %}active{% endif %}">
+        <img src="{{ image.img.url }}" class="d-block w-100" alt="Фото пациента">
+      </div>
+    {% endfor %}
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#patientCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#patientCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
 <p><strong>Возраст:</strong> {{ patient.age_display }}</p>
 <p><strong>Рост:</strong> {{ patient.rost }} см</p>
 <p><strong>Вес:</strong> {{ patient.ves }} кг</p>
@@ -12,11 +36,52 @@
 <hr>
 <h2>История осмотров</h2>
 {% if osmotry %}
-    <ul>
-        {% for osmotr in osmotry %}
-            <li>{{ osmotr.data_osmotra|date:"j E Y H:i" }} — Рост: {{ osmotr.rost }} см, Вес: {{ osmotr.ves }} кг, ИМТ: {{ osmotr.imt }}</li>
-        {% endfor %}
-    </ul>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Рост (см)</th>
+                <th>Рост SDS</th>
+                <th>Рост центиль</th>
+                <th>Вес (кг)</th>
+                <th>Вес SDS</th>
+                <th>Вес центиль</th>
+                <th>ИМТ</th>
+                <th>ИМТ SDS</th>
+                <th>ИМТ центиль</th>
+                <th>Физическое развитие</th>
+                <th>Нарушения</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for osmotr in osmotry %}
+                <tr>
+                    <td>{{ osmotr.data_osmotra|date:"j E Y H:i" }}</td>
+                    <td>{{ osmotr.rost }}</td>
+                    <td>{{ osmotr.rost_SDS }}</td>
+                    <td>{{ osmotr.rost_centil }}</td>
+                    <td>{{ osmotr.ves }}</td>
+                    <td>{{ osmotr.ves_SDS }}</td>
+                    <td>{{ osmotr.ves_centil }}</td>
+                    <td>{{ osmotr.imt }}</td>
+                    <td>{{ osmotr.imt_SDS }}</td>
+                    <td>{{ osmotr.imt_centil }}</td>
+                    <td>
+                        {% for fiz in osmotr.fizic_razvitie.all %}
+                          {{ fiz.type_razvitya }} / {{ fiz.type_garmonic }}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for nar in osmotr.narushenie.all %}
+                            {{ nar.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            —
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% else %}
     <p>Осмотры пока не добавлены.</p>
 {% endif %}

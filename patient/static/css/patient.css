@@ -1,0 +1,21 @@
+.card-img-square-box {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-size: cover;
+    background-position: center;
+}
+
+.square-carousel,
+.square-carousel .carousel-inner,
+.square-carousel .carousel-item {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+}
+
+.square-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}

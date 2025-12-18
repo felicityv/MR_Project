@@ -9,5 +9,4 @@ urlpatterns = [
     # path('create_rost/',imt_sozdanie)
     path('patients/', views.patient_info, name='patient_list'),
     path('patients/<int:pk>/', views.patient_info, name='patient_detail'),
-    path('main/', patient_info),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

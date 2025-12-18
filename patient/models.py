@@ -3,10 +3,10 @@ from datetime import date
 from fiz_razv.models import Rost, Ves, Imt
 
 class Patient(models.Model):
-    GENDER_CHOICES = {
-        "М": "Мужской",
-        "Ж": "Женский"
-    }
+    GENDER_CHOICES = [
+        ("М", "Мужской"),
+        ("Ж", "Женский"),
+    ]
     surname = models.CharField(max_length=100)
     name = models.CharField(max_length=100)
     data_birth = models.DateField()
@@ -44,15 +44,15 @@ class Patient(models.Model):
         return f"{years} лет {months} месяцев"
 
 class OsmotrPatient(models.Model):
-    CENTIL_CHOICES = {
-        "ниже 3": "ниже 3",
-        "3-10": "3-10",
-        "10-25": "10-25",
-        "25-75": "25-75",
-        "75-90": "75-90",
-        "90-97": "90-97",
-        "выше 97": "выше 97"
-    }
+    CENTIL_CHOICES = [
+        ("ниже 3", "ниже 3"),
+        ("3-10", "3-10"),
+        ("10-25", "10-25"),
+        ("25-75", "25-75"),
+        ("75-90", "75-90"),
+        ("90-97", "90-97"),
+        ("выше 97", "выше 97"),
+        ]
     data_osmotra = models.DateTimeField(auto_now_add=True)
     rost = models.FloatField(null=True, blank=True)
     ves = models.FloatField(null=True, blank=True)
@@ -68,7 +68,7 @@ class OsmotrPatient(models.Model):
     narushenie = models.ManyToManyField("fiz_razv.Narushenie", editable=False)
 
     def save(self, *args, **kwargs):
-        from fiz_razv.services import analyze_centile, fizrazvitie, calculate_age_key
+        from fiz_razv.services import analyze_centile, fizrazvitie, calculate_age_key, narushenia
         self.imt = round(self.ves / ((self.rost / 100) ** 2), 1)
         years, months = self.patient.calculate_age
         age_key = calculate_age_key(years, months)
@@ -78,16 +78,20 @@ class OsmotrPatient(models.Model):
         self.rost_SDS, self.rost_centil = analyze_centile(self.rost, Rost, age_key, gender)
         self.ves_SDS, self.ves_centil = analyze_centile(self.ves, Ves, age_key, gender)
         self.imt_SDS, self.imt_centil = analyze_centile(self.imt, Imt, age_key, gender)
-        fiz_text = fizrazvitie(self.rost_centil, self.ves_centil)
-        print(fiz_text)
+        fiz_obj = fizrazvitie(self.rost_centil, self.ves_centil)
+        super().save(*args, **kwargs)        
+        self.fizic_razvitie.add(fiz_obj)
+        nar_obj, _ = narushenia(self.rost_SDS, self.ves_SDS, self.imt_SDS, years)
+        self.narushenie.add(nar_obj)
         self.patient.rost = self.rost
         self.patient.ves = self.ves
         self.patient.imt = self.imt
         self.patient.save()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Осмотр {self.patient} от {self.data_osmotra.date()}'
 
-
+class PatientImage(models.Model):
+    img=models.ImageField(upload_to='patient_image')
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
