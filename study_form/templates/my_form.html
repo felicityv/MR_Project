@@ -3,7 +3,11 @@
 
 {% block content %}
 <h2>Форма</h2>
-
+{% if errors %}
+{% for error in erroos %}
+<p style="color: red;">{{error}}</p>
+{% endfor %}
+{% endif %}
 <form method="post" style="display: flex; flex-direction: column; gap: 5px; max-width: 200px;">
   {% csrf_token %}
   <input type="text" name="first_name" placeholder="Имя" required>
@@ -12,7 +16,10 @@
   <button type="submit">Отправить</button>
 </form>
 <div class="">
+<p style="color: rgb(60, 178, 123);">{{last_author}}</p>
   {% for author in authors %}
-    <p> {{author.first_name}} {{author.last_name}} {{author.age}}</p>
+  {% if not last_author == author %}
+  <p> {{author.first_name}} {{author.last_name}} {{author.age}}</p>
+  {% end if %}
   {% endfor %}
 {% endblock %}

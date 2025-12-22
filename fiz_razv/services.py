@@ -1,4 +1,4 @@
-from .models import FizicRazvit
+from .models import FizicRazvit, Narushenie
 
 def calculate_age_key(age_years, age_months):
     if 1 <= age_months <= 3:
