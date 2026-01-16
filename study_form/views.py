@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest
 from .models import Author
+from .forms import AuthorForm
 
 # def form_view(request):
 #     return render(request, 'my_form.html')
@@ -9,7 +10,7 @@ def get_form(request):
     # authors = Author.objects.all()
     authors = Author.objects.all().order_by("-id")
     last_author=authors[0]
-    print(authors[])
+    print(authors[-1])
     context = {
         "authors":authors,
         "errors":[],
@@ -36,3 +37,15 @@ def get_form(request):
             print("Все должно быть заполнено")
 
     return render(request, 'my_form.html', context)
+
+from django.shortcuts import render
+
+
+def get_django_form(request):
+    form = AuthorForm()
+    if request.method == "POST":
+        form = AuthorForm(request.POST)
+        print (form)
+    context={"form":form}
+    return render(request, "django_form.html", context)
+

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if patient %}Редактировать{% else %}Добавить{% endif %} пациента{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/patient.css' %}">
+{% endblock %}
+
+{% block content %}
+  <h2>{% if patient %}Редактировать{% else %}Добавить нового{% endif %} пациента</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <strong>Ошибки заполнения:</strong>
+        {{ form.errors }}
+      </div>
+    {% endif %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary">
+      {% if patient %}Сохранить изменения{% else %}Создать карточку{% endif %}
+    </button>
+  </form>
+
+  <!-- Универсальная кнопка «Назад» -->
+  <a href="{% if patient %}{% url 'patients:patient_detail' patient_id=patient.pk %}{% else %}{% url 'patients:patient_list' %}{% endif %}"
+     class="btn btn-secondary mt-3">← Назад</a>
+{% endblock %}

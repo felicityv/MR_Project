@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if osmotr %}Редактировать осмотр{% else %}Добавить осмотр{% endif %}{% endblock %}
+
+{% block content %}
+
+<h2>Регистрация</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Зарегистрироваться</button>
+</form>
+
+
+
+{% load static %}
+
+{% block title %}Регистрация — MarketPlace{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}"/>
+{% endblock css %}
+{% block main %}
+<main class="main">
+    <div class="auth-container">
+        <h2 class="auth-title">Регистрация</h2>
+
+        <form class="auth-form" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="auth-btn">Создать аккаунт</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+        </div>
+    </div>
+</main>
+{% endblock %}

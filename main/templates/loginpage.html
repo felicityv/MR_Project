@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if osmotr %}Редактировать осмотр{% else %}Добавить осмотр{% endif %}{% endblock %}
+
+{% block content %}
+
+<h2>Вход</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Войти</button>
+</form>
+
+
+{% load static %}
+
+{% block title %}Вход — MarketPlace{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}"/>
+    {% endblock css %}
+
+{% block main %}
+<main class="main">
+    <div class="auth-container">
+        <h2 class="auth-title">Вход в аккаунт</h2>
+        
+        <form class="auth-form" method="post">
+            {% csrf_token %}
+            <!-- Выводим форму как параграфы (стандарт Django), 
+                 стили CSS выше подхват��т label и input -->
+            {{ form.as_p }}
+            
+            <button type="submit" class="auth-btn">Войти</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+        </div>
+    </div>
+</main>
+{% endblock %}

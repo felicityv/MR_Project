@@ -20,6 +20,6 @@
   {% for author in authors %}
   {% if not last_author == author %}
   <p> {{author.first_name}} {{author.last_name}} {{author.age}}</p>
-  {% end if %}
+  {% endif %}
   {% endfor %}
 {% endblock %}

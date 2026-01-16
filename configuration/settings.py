@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'main',
     'fiz_razv',
     'patient',
-    'study_form'
+    'study_form',
+    'mkb10',
+    'krit_invalid'
 ]
 
 MIDDLEWARE = [
@@ -116,7 +118,7 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEBUG = True
 MEDIA_URL = '/media/'
@@ -146,3 +148,23 @@ TEMPLATES = [
         },
     },
 ]
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'patients': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}

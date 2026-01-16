@@ -20,8 +20,12 @@ class FizicRazvit(models.Model):
     ]
     type_razvitya = models.CharField(max_length=30, choices=STEPEN_CHOICES)
     type_garmonic = models.CharField(max_length=30, choices=GARMON_CHOICES)
+    def get_type_razvitya_display(self):
+        return dict(self.STEPEN_CHOICES).get(self.type_razvitya, self.type_razvitya)
+    def get_type_garmonic_display(self):
+        return dict(self.GARMON_CHOICES).get(self.type_garmonic, self.type_garmonic)
     def __str__(self):
-        return f'{self.type_razvitya}, {self.type_garmonic}'
+        return f'{self.get_type_razvitya_display()}, {self.get_type_garmonic_display()}'
 
 class Narushenie(models.Model):
     NARUSH_CHOICES = [
@@ -35,7 +39,8 @@ class Narushenie(models.Model):
     ]
     type_narushenia = models.CharField(max_length=100, choices=NARUSH_CHOICES)
     def __str__(self):
-        return self.type_narushenia
+        return f'{self.get_type_narushenia_display()}'
+
 
 class Har_Pokaz(models.Model):
     GENDER_CHOICES = {

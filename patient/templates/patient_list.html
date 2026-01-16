@@ -1,30 +1,62 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Список пациентов{% endblock %}
+
 {% block content %}
 <h1 class="mb-4">Список пациентов</h1>
+<a href="{% url 'patients:patient_add' %}" class="btn btn-primary mb-3">Добавить пациента</a>
+
 <div class="row">
-    {% for patient in patients %}
-        <div class="col-md-4 mb-4">
-            <div class="card border shadow-sm h-100" style="width: 18rem;">
-                {% if patient.foto %}
-                    <div class="card-img-square-box"
-                    style="background-image:url('{{ patient.foto.url }}')">
-                    </div>
-                {% endif %}
-                <div class="card-body">
-                    <a href="{% url 'patient_detail' patient.id %}" h5 class="card-link">{{ patient.surname }} {{ patient.name }}</h5></a>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ patient.age_display }}</h6>
-                    <p class="card-text">
-                        <strong>Дата рождения:</strong> {{ patient.data_birth|date:"j E Y" }} <br>
-                        <strong>Пол:</strong> {{ patient.get_gender_display }} <br>
-                        <strong>Рост:</strong> {{ patient.rost }} см <br>
-                        <strong>Вес:</strong> {{ patient.ves }} кг <br>
-                        <strong>ИМТ:</strong> {{ patient.imt }}
-                    </p>
-                </div>
-            </div>
+  {% for patient in patients %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        {% if patient.foto %}
+          <img src="{{ patient.foto.url }}" class="card-img-top" style="height:200px; object-fit:cover;">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ patient.surname }} {{ patient.name }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ patient.age_display }}</h6>
+          <p class="card-text">
+            Дата рождения: {{ patient.data_birth|date:"j E Y" }}<br>
+            Пол: {{ patient.get_gender_display }}<br>
+            Рост: {{ patient.rost }} см<br>
+            Вес: {{ patient.ves }} кг<br>
+            ИМТ: {{ patient.imt }}
+          </p>
+          <a href="{% url 'patients:patient_detail' patient.id %}" class="btn btn-sm btn-outline-primary">Подробно</a>
+          <a href="{% url 'patients:patient_edit' patient.id %}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+          <button type="button" class="btn btn-sm btn-danger ms-2"
+                  data-bs-toggle="modal"
+                  data-bs-target="#delModal{{ patient.id }}">
+            Удалить
+          </button>
         </div>
-    {% endfor %}
+      </div>
+    </div>
+
+    <!-- Модальное окно подтверждения -->
+    <div class="modal fade" id="delModal{{ patient.id }}" tabindex="-1"
+         aria-labelledby="delModalLabel{{ patient.id }}" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" action="{% url 'patients:patient_delete' patient.id %}">
+            {% csrf_token %}
+            <div class="modal-header">
+              <h5 class="modal-title" id="delModalLabel{{ patient.id }}">Подтверждение удаления</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              Удалить пациента <strong>{{ patient.surname }} {{ patient.name }}</strong>? <br>
+              Это действие необратимо.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-danger">Удалить</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}

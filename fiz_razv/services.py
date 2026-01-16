@@ -38,7 +38,7 @@ def analyze_centile(parametr, model_class, age_key, gender):
 
 def narushenia(SDSrost, SDSves, SDSimt, age_years):
     if SDSrost <= -2:
-        return Narushenie.objects.get_or_create(type_narushenia="ХБЭН")
+        return Narushenie.objects.get_or_create(type_narushenia="Низкорослость ХБЭН")
     elif SDSrost >= 2:
         return Narushenie.objects.get_or_create(type_narushenia="Высокорослость")
     if age_years < 5:

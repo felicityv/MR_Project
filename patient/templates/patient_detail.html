@@ -1,98 +1,153 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}Карточка пациента{% endblock %}
-        {% block css %}
-<link rel="stylesheet" href="{% static 'css/patient.css' %}">
-        {% endblock %}
+
 {% block content %}
-<h1>{{ patient.surname }} {{ patient.name }}</h1>
-<div id="patientCarousel" class="carousel slide square-carousel" data-bs-ride="carousel" data-bs-interval="3000">
-  <div class="carousel-inner">
-    {% if patient.foto %}
-      <div class="carousel-item active">
-        <img src="{{ patient.foto.url }}" class="d-block w-100" alt="Фото пациента">
+<div class="container py-4">
+  <div class="row">
+    <div class="col-md-3 text-center">
+      {% if patient.foto %}
+        <img src="{{ patient.foto.url }}" class="img-thumbnail rounded mb-3" alt="Фото" style="max-height:250px;">
+      {% else %}
+        <div class="bg-secondary text-white rounded p-5 mb-3">Нет фото</div>
+      {% endif %}
+      <h4>{{ patient.surname }} {{ patient.name }}</h4>
+      <p class="text-muted">{{ patient.age_display }}</p>
+    </div>
+
+    <div class="col-md-9">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white"><h5 class="mb-0">Основные сведения</h5></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-4"><strong>Пол:</strong> {{ patient.get_gender_display }}</div>
+            <div class="col-sm-4"><strong>Дата рождения:</strong> {{ patient.data_birth|date:"j E Y" }}</div>
+            <div class="col-sm-4"><strong>СУЗ:</strong> {{ patient.suz|default:"—" }}</div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-sm-4"><strong>Рост:</strong> {{ patient.rost }} см</div>
+            <div class="col-sm-4"><strong>Вес:</strong> {{ patient.ves }} кг</div>
+            <div class="col-sm-4"><strong>ИМТ:</strong> {{ patient.imt }}</div>
+          </div>
+        </div>
       </div>
-    {% endif %}
 
-    {% for image in images %}
-      <div class="carousel-item {% if not patient.foto and forloop.first %}active{% endif %}">
-        <img src="{{ image.img.url }}" class="d-block w-100" alt="Фото пациента">
+      <div class="card mb-4">
+        <div class="card-header bg-info text-white"><h5 class="mb-0">Клинико-функциональные данные</h5></div>
+        <div class="card-body">
+          <p><strong>Диагноз по МКБ-10:</strong><br>
+            {% if o.mkb %}
+              {{ patient.mkb.code }} – {{ patient.mkb.name|truncatechars:40 }}
+            {% else %}
+              не указан
+            {% endif %}
+          </p>
+          <p><strong>Основной диагноз:</strong><br>{{ patient.diagnoz_osn|default:"не указан" }}</p>
+          <p><strong>Сопутствующий диагноз:</strong><br>{{ patient.diagnoz_sop|default:"не указан" }}</p>
+          <p><strong>Степень утраты здоровья (СУЗ):</strong> {{ patient.suz|default:"—" }}</p>
+          <p><strong>Реабилитационный (абилитационный) потенциал:</strong> {{ patient.rp|default:"—" }}</p>
+        </div>
       </div>
-    {% endfor %}
-  </div>
 
-  <button class="carousel-control-prev" type="button" data-bs-target="#patientCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#patientCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </button>
-</div>
-<p><strong>Возраст:</strong> {{ patient.age_display }}</p>
-<p><strong>Рост:</strong> {{ patient.rost }} см</p>
-<p><strong>Вес:</strong> {{ patient.ves }} кг</p>
-<p><strong>ИМТ:</strong> {{ patient.imt }}</p>
+      <div class="card mb-4">
+        <div class="card-header bg-secondary text-white"><h5 class="mb-0">Физическое развитие (последний осмотр)</h5></div>
+        <div class="card-body">
+          {% if last_osmotr %}
+            <div class="row">
+              <div class="col-sm-6"><strong>Рост:</strong> {{ last_osmotr.rost }} см (ЦК: {{ last_osmotr.rost_centil|default:"—" }}, SDS={{ last_osmotr.rost_SDS|floatformat:2|default:"—"}})</div>
+              <div class="col-sm-6"><strong>Вес:</strong> {{ last_osmotr.ves }} кг (ЦК: {{ last_osmotr.ves_centil|default:"—" }}, SDS={{ last_osmotr.ves_SDS|floatformat:2|default:"—"}})</div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-sm-6"><strong>ИМТ:</strong> {{ last_osmotr.imt }} (ЦК: {{ last_osmotr.imt_centil|default:"—" }}, SDS={{ last_osmotr.imt_SDS|floatformat:2|default:"—"}})</div>
+              <div class="col-sm-6"><strong>Физическое развитие:</strong> {{ last_osmotr.fizic_razvitie.all|join:", "|default:"—" }}</div>
+            </div>
+            <p class="mt-2 mb-0"><strong>Нарушения:</strong> {{ last_osmotr.narushenie.all|join:", "|default:"нет" }}</p>
+          {% else %}
+            <p class="mb-0 text-muted">Осмотры пока не проводились</p>
+          {% endif %}
+        </div>
+      </div>
 
-<hr>
-<h2>История осмотров</h2>
-{% if osmotry %}
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Дата</th>
-                <th>Рост (см)</th>
-                <th>Рост SDS</th>
-                <th>Рост центиль</th>
-                <th>Вес (кг)</th>
-                <th>Вес SDS</th>
-                <th>Вес центиль</th>
-                <th>ИМТ</th>
-                <th>ИМТ SDS</th>
-                <th>ИМТ центиль</th>
-                <th>Физическое развитие</th>
-                <th>Нарушения</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for osmotr in osmotry %}
+      <hr class="my-4">
+      <h2>История осмотров</h2>
+      {% if osmotry %}
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Дата</th><th>Возраст</th><th>Рост (см)</th><th>Рост SDS</th><th>Рост центиль</th>
+                <th>Вес (кг)</th><th>Вес SDS</th><th>Вес центиль</th><th>ИМТ</th><th>ИМТ SDS</th><th>ИМТ центиль</th>
+                <th>Физическое развитие</th><th>Нарушения</th><th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for o in osmotry %}
                 <tr>
-                    <td>{{ osmotr.data_osmotra|date:"j E Y H:i" }}</td>
-                    <td>{{ osmotr.rost }}</td>
-                    <td>{{ osmotr.rost_SDS }}</td>
-                    <td>{{ osmotr.rost_centil }}</td>
-                    <td>{{ osmotr.ves }}</td>
-                    <td>{{ osmotr.ves_SDS }}</td>
-                    <td>{{ osmotr.ves_centil }}</td>
-                    <td>{{ osmotr.imt }}</td>
-                    <td>{{ osmotr.imt_SDS }}</td>
-                    <td>{{ osmotr.imt_centil }}</td>
-                    <td>
-                        {% for fiz in osmotr.fizic_razvitie.all %}
-                          {{ fiz.type_razvitya }} / {{ fiz.type_garmonic }}
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for nar in osmotr.narushenie.all %}
-                            {{ nar.name }}{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            —
-                        {% endfor %}
-                    </td>
+                  <td>{{ o.data_osmotra|date:"j.m.Y" }}</td>
+                  <td>{{ o.age_on_date_display }}</td>
+                  <td>{{ o.rost }}</td><td>{{ o.rost_SDS|floatformat:2 }}</td><td>{{ o.rost_centil }}</td>
+                  <td>{{ o.ves }}</td><td>{{ o.ves_SDS|floatformat:2 }}</td><td>{{ o.ves_centil }}</td>
+                  <td>{{ o.imt }}</td><td>{{ o.imt_SDS|floatformat:2 }}</td><td>{{ o.imt_centil }}</td>
+                  <td>{{ o.fizic_razvitie.all|join:", "|default:"—" }}</td>
+                  <td>{{ o.narushenie.all|join:", "|default:"—" }}</td>
+                  <td class="text-nowrap">
+                    <!-- Редактировать -->
+                    <a href="{% url 'patients:osmotr_edit' osmotr_id=o.id %}"
+                      class="btn btn-sm btn-outline-primary me-1"
+                      title="Редактировать">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <!-- Удалить -->
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#delOsmotr{{ o.id }}">
+                      <i class="bi bi-trash"></i>
+                    </button>
+
+                    <div class="modal fade" id="delOsmotr{{ o.id }}" tabindex="-1"
+                         aria-labelledby="delOsmotrLabel{{ o.id }}" aria-hidden="true">
+                      <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                          <form method="post" action="{% url 'patients:osmotr_delete' osmotr_id=o.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                              <h6 class="modal-title" id="delOsmotrLabel{{ o.id }}">Удалить осмотр?</h6>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                              <p class="mb-0"><strong>{{ o.data_osmotra|date:"j.m.Y" }}</strong></p>
+                              <small class="text-muted">Действие необратимо</small>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                              <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>Осмотры пока не добавлены.</p>
-{% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted">Осмотры пока не добавлены.</p>
+      {% endif %}
 
-<hr>
-<h2>Добавить новый осмотр</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Сохранить осмотр</button>
-</form>
+      <div class="mt-3">
+        <a href="{% url 'patients:osmotr_add' patient_id=patient.pk %}"
+          class="btn btn-primary mb-3">
+          <i class="bi bi-plus-circle"></i> Добавить новый осмотр
+        </a>
+      </div>
 
-<a href="{% url 'patient_list' %}" class="btn btn-secondary mt-3">← Назад к списку</a>
+      <div class="mt-3">
+        <a href="{% url 'patients:patient_list' %}" class="btn btn-outline-secondary">← Назад к списку</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

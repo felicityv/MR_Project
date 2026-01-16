@@ -3,24 +3,91 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Мой сайт{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}МР-Дневник{% endblock %}</title>
 
-    <!-- Bootstrap -->
+    <!-- Bootstrap 5 + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- Ваши стили -->
     <link rel="stylesheet" href="{% static 'css/patient.css' %}">
-
     {% block css %}{% endblock %}
 
     <style>
-        body { font-family: Georgia, serif; }
+        body { font-family: 'Segoe UI', Georgia, serif; background-color: #f8f9fa; }
+        .navbar-brand { font-weight: 600; }
+        .flash-messages { position: fixed; top: 1rem; right: 1rem; z-index: 1100; }
     </style>
 </head>
+
 <body>
-    <div class="container mt-4">
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'patients:patient_list' %}">
+                <i class="bi bi-journal-medical me-2"></i>МР-Дневник
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'patients:patient_list' %}">
+                            <i class="bi bi-journal-medical me-2"></i>МР-Дневник
+                        </a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+            <div class="collapse navbar-collapse" id="mainMenu">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'patient_list' %}active{% endif %}"
+                           href="{% url 'patients:patient_list' %}">
+                            <i class="bi bi-people me-1"></i>Пациенты
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'patients:patient_add' %}">
+                            <i class="bi bi-person-plus me-1"></i>Добавить
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FLASH-сообщения (django.contrib.messages) -->
+    {% if messages %}
+        <div class="flash-messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow" role="alert">
+                    <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% elif message.tags == 'error' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Основной контент -->
+    <main class="container my-4">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <!-- Подвал -->
+    <footer class="bg-light text-center py-3 mt-auto">
+        <small class="text-muted">© 2025 МР-Дневник</small>
+    </footer>
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Автозакрытие flash-сообщений -->
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.flash-messages .alert').forEach(el => el.remove());
+        }, 5000);
+    </script>
+
+    {% block js %}{% endblock %}
 </body>
 </html>

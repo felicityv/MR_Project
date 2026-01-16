@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if osmotr %}Редактировать осмотр{% else %}Добавить осмотр{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2>
+    {% if osmotr %}
+      Редактировать осмотр от {{ osmotr.data_osmotra|date:"j.m.Y H:i" }}
+    {% else %}
+      Добавить новый осмотр
+    {% endif %}
+  </h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <strong>Ошибки заполнения:</strong> {{ form.errors }}
+      </div>
+    {% endif %}
+
+    {# Дата осмотра #}
+    <div class="mb-3">
+      <label for="{{ form.on_date.id_for_label }}" class="form-label">{{ form.on_date.label }}</label>
+      {{ form.on_date }}
+    </div>
+
+    {# Рост #}
+    <div class="mb-3">
+      <label for="{{ form.rost.id_for_label }}" class="form-label">{{ form.rost.label }}</label>
+      {{ form.rost }}
+    </div>
+
+    {# Вес #}
+    <div class="mb-3">
+      <label for="{{ form.ves.id_for_label }}" class="form-label">{{ form.ves.label }}</label>
+      {{ form.ves }}
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        {% if osmotr %}Сохранить изменения{% else %}Добавить осмотр{% endif %}
+      </button>
+
+      {% if osmotr %}
+        <a href="{% url 'patients:patient_detail' patient_id=osmotr.patient.id %}" class="btn btn-secondary">Отмена</a>
+      {% else %}
+        <a href="{% url 'patients:patient_detail' patient_id=patient.pk %}" class="btn btn-secondary">Отмена</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
